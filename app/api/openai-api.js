@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-const { buildPrompt } = require('../../lib/addressService');
+const { buildPrompt } = require('../lib/addressService');
 const apiKey = process.env.OPENAI_API_KEY;
 
 export async function POST(request) {
