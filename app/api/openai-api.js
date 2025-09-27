@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 const { buildPrompt } = require('../../lib/addressService');
+const apiKey = process.env.OPENAI_API_KEY;
 
 export async function POST(request) {
     try {
-        const { apiKey, prompt, address, basePrompt } = await request.json();
+        const { prompt, address, basePrompt } = await request.json();
 
         if (!apiKey) {
             return NextResponse.json({ error: 'Missing apiKey' }, { status: 400 });
         }
 
-        // If an address is provided, build a prompt from it. Otherwise expect prompt.
         const finalPrompt = address ? buildPrompt({ address, basePrompt }) : prompt;
 
         if (!finalPrompt) {
@@ -23,7 +23,7 @@ export async function POST(request) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'gpt-3.5-turbo',
+                model: 'gpt-4o-mini',
                 messages: [{ role: 'user', content: finalPrompt }],
             }),
         });
