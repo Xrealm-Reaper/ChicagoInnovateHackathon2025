@@ -221,7 +221,7 @@ const LoadingSection = ({ address }: LoadingSectionProps) => {
       <div className="mt-8 p-6 bg-card rounded-radius-lg shadow-soft">
         <p className="text-muted-foreground">
           Please wait while we compile your comprehensive property report. 
-          This usually takes 30-60 seconds.
+          This usually takes less than a minute.
         </p>
       </div>
     </div>
