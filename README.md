@@ -1,11 +1,9 @@
 # README
 
-## Setup
+## Zone In Overview
+Zoning rules made simple!
 
-1. Clone the repository
-2. Copy `.env.example` to `.env.local` and fill in the environment variables for OPENAI
-3. Run `npm install` to install dependencies
-4. Run `npm run dev` to run the app locally
+Confused by Chicago's zoning codes? Enter an address to get a clear summary of what you can build on your lot.
 
 ## Prerequisites
 
