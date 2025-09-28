@@ -16,7 +16,7 @@ openaiRouter.post("/openai-api", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "o1-mini",
+        model: process.env.OPENAI_MODEL,
         messages: [{ role: "user", content: finalPrompt }],
       }),
     });

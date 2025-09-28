@@ -6,7 +6,7 @@ type ChicagoContextValue = {
   loading: boolean;
   error: string | null;
   // Accept only an address string
-  getZoneClass: (address: string) => Promise<string>;
+  getZoneClass: (address: string) => Promise< { addressMatched: any; zoneClass: any } >;
 };
 
 const ChicagoContext = createContext<ChicagoContextValue | undefined>(undefined);
@@ -26,8 +26,8 @@ export const ChicagoCityProvider = ({ children }: { children: React.ReactNode })
       const res = await getZoningByAddress(address);
 
       setLoading(false);
-
-      return JSON.stringify(res);
+      
+      return res;
     } catch (err: any) {
       setLoading(false);
       setError(err?.message || String(err));

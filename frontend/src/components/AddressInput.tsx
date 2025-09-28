@@ -109,7 +109,7 @@ const AddressInput = ({ onSubmit }: AddressInputProps) => {
               Comprehensive Reports
             </h3>
             <p className="text-muted-foreground text-sm">
-              Zoning codes, ownership, tax info, permits, and violation history.
+              Zoning codes.
             </p>
           </div>
           

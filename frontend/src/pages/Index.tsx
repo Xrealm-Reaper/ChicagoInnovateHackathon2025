@@ -34,11 +34,11 @@ const IndexContent = () => {
 
     try {
       // Use the inputAddress parameter instead of the state variable
-      const zoneLabel = await getZoneClass(inputAddress);
-      if (!zoneLabel) throw new Error("No zoning label found for location");
-      console.log(`Zoning for ${inputAddress}:`, zoneLabel);
+      const { addressMatched, zoneClass } = await getZoneClass(inputAddress);
+      if (!zoneClass) throw new Error("No zoning label found for location");
+      console.log(`Zoning for ${inputAddress}:`, zoneClass);
 
-      const response = await sendPrompt(inputAddress, zoneLabel);
+      const response = await sendPrompt(inputAddress, zoneClass);
       if (!response) throw new Error("No response from LLM");
       console.log("LLM Response:", response);
       
@@ -49,9 +49,9 @@ const IndexContent = () => {
           layerId: 15,
           layerName: "Zoning",
           displayFieldName: "ZONE_CLASS",
-          value: zoneLabel,
+          value: zoneClass,
           attributes: {
-            ZONE_CLASS: zoneLabel,
+            ZONE_CLASS: zoneClass,
             CASE_NUMBER: "12345",
             UPDATE_TIMESTAMP: new Date().toISOString()
           }
