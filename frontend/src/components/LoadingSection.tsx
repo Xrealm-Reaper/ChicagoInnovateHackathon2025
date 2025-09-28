@@ -5,8 +5,15 @@ interface LoadingSectionProps {
   address: string;
 }
 
-// Add your Google Maps API key here
-const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+// Use a config object or environment detection
+const getGoogleMapsApiKey = () => {
+  if (import.meta.env.VITE_GOOGLE_MAPS_API_KEY === undefined){
+    return null
+  }
+  return import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+};
+
+const GOOGLE_MAPS_API_KEY = getGoogleMapsApiKey();
 
 // Google Maps type definitions
 interface GoogleMapsWindow extends Window {
@@ -40,7 +47,7 @@ const LoadingSection = ({ address }: LoadingSectionProps) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentStep(prev => (prev < steps.length - 1 ? prev + 1 : prev));
-    }, 5000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -48,7 +55,7 @@ const LoadingSection = ({ address }: LoadingSectionProps) => {
   useEffect(() => {
     // Load Google Maps script if not already loaded
     const googleWindow = window as GoogleMapsWindow;
-    if (!googleWindow.google) {
+    if (GOOGLE_MAPS_API_KEY !== null &&!googleWindow.google) {
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
       script.async = true;
