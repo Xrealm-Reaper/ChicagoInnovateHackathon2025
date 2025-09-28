@@ -1,6 +1,3 @@
-// app/api/chicagoCityAPI.js
-// Node 18+ (global fetch)
-
 import {
   geocodeAddress,
   projectTo3435,
@@ -40,10 +37,10 @@ export async function identifyAtPoint(
   const geometry = { x: x3435, y: y3435, spatialReference: { wkid: 3435 } };
 
   const params = new URLSearchParams({
-    f: "json",
-    geometry: JSON.stringify(geometry),
+    f: "json", // ask ArcGIS to return JSON
+    geometry: JSON.stringify(geometry), // e.g. {"x":1171896.83,"y":1893284.14,"spatialReference":{"wkid":3435}}
     geometryType: "esriGeometryPoint",
-    sr: "3435",
+    sr: "3435", // specify EPSG:3435
     tolerance: "2",
     returnGeometry: "false",
     mapExtent: JSON.stringify(makeExtentAroundPoint(x3435, y3435, bufferFeet)),
