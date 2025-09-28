@@ -105,14 +105,20 @@ export async function getZoningByAddress(
   // 5) Parse ZONE_CLASS
   const zoneClass = extractZoneClass(identifyRaw);
 
-  return {
+//   return {
+//     addressMatched: geo.address,
+//     lon: geo.lon,
+//     lat: geo.lat,
+//     x3435,
+//     y3435,
+//     zoneClass,
+//     identifyRaw,
+//     geocodeDebug: geo.candidateMeta,
+//   };
+// }
+return {
     addressMatched: geo.address,
-    lon: geo.lon,
-    lat: geo.lat,
-    x3435,
-    y3435,
-    zoneClass,
-    identifyRaw,
-    geocodeDebug: geo.candidateMeta,
+    zoneClass
   };
 }
+
