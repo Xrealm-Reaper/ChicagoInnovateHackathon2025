@@ -1,50 +1,67 @@
 import { useState } from "react";
 import AddressInput from "../components/AddressInput";
-import { ChicagoCityProvider } from "../../../app/providers/ChicagoCityProvider";
 import LoadingSection from "../components/LoadingSection";
 import ResultsSection from "../components/ResultsSection";
 import { useToast } from "../hooks/use-toast";
+import { ChicagoCityProvider, useChicagoCity } from "../../../app/providers/ChicagoCityProvider";
+import { useOpenAI } from "../../../app/providers/OpenAIProvider";
 
 export type AppState = "input" | "loading" | "results";
 
 export interface PropertyData {
   address: string;
-  zoning?: string;
-  owner?: string;
-  taxInfo?: string;
-  permits?: string[];
-  violations?: string[];
-  assessment?: string;
+  results: Array<{
+    layerId: number;
+    layerName: string;
+    displayFieldName: string;
+    value: string;
+    attributes: Record<string, any>;
+  }>;
 }
 
-const Index = () => {
+// Create an inner component that uses the Chicago City context
+const IndexContent = () => {
   const [currentState, setCurrentState] = useState<AppState>("input");
   const [address, setAddress] = useState("");
   const [propertyData, setPropertyData] = useState<PropertyData | null>(null);
   const { toast } = useToast();
+  const { getZoneClass } = useChicagoCity(); // Now this is inside the provider
+  const { sendPrompt } = useOpenAI();
 
   const handleAddressSubmit = async (inputAddress: string) => {
     setAddress(inputAddress);
     setCurrentState("loading");
 
     try {
-      // Simulate API call - replace with actual Chicago City API integration
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Use the inputAddress parameter instead of the state variable
+      const { addressMatched, zoneClass } = await getZoneClass(inputAddress);
+      if (!zoneClass) throw new Error("No zoning label found for location");
+      console.log(`Zoning for ${inputAddress}:`, zoneClass);
+
+      const response = await sendPrompt(inputAddress, zoneClass);
+      if (!response) throw new Error("No response from LLM");
+      console.log("LLM Response:", response);
       
-      // Mock property data - replace with actual API response
-      const mockData: PropertyData = {
+      // Create mock property data for testing
+      const mockPropertyData: PropertyData = {
         address: inputAddress,
-        zoning: "R-4 Residential",
-        owner: "John Smith",
-        taxInfo: "$2,450 annual property tax",
-        permits: ["Building Permit #2023-001", "Electrical Permit #2023-045"],
-        violations: [],
-        assessment: "$185,000"
+        results: [{
+          layerId: 15,
+          layerName: "Zoning",
+          displayFieldName: "ZONE_CLASS",
+          value: zoneClass,
+          attributes: {
+            ZONE_CLASS: zoneClass,
+            CASE_NUMBER: "12345",
+            UPDATE_TIMESTAMP: new Date().toISOString()
+          }
+        }]
       };
       
-      setPropertyData(mockData);
+      setPropertyData(mockPropertyData);
       setCurrentState("results");
     } catch (error) {
+      console.error("Error in handleAddressSubmit:", error);
       toast({
         title: "Error",
         description: "Failed to retrieve property information. Please try again.",
@@ -65,9 +82,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8">
         {currentState === "input" && (
           <div className="section-enter">
-              <ChicagoCityProvider>
-                <AddressInput onSubmit={handleAddressSubmit} />
-              </ChicagoCityProvider>
+            <AddressInput onSubmit={handleAddressSubmit} />
           </div>
         )}
         
@@ -87,6 +102,15 @@ const Index = () => {
         )}
       </div>
     </div>
+  );
+};
+
+// Main component that wraps everything in the provider
+const Index = () => {
+  return (
+    <ChicagoCityProvider>
+      <IndexContent />
+    </ChicagoCityProvider>
   );
 };
 

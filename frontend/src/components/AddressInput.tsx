@@ -2,8 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapPin, Search } from "lucide-react";
-import { useChicagoCity } from "../../../app/providers/ChicagoCityProvider";
-import { useOpenAI } from "../../../app/providers/OpenAIProvider";
 
 interface AddressInputProps {
   onSubmit?: (address: string) => void;
@@ -12,8 +10,6 @@ interface AddressInputProps {
 const AddressInput = ({ onSubmit }: AddressInputProps) => {
   const [address, setAddress] = useState("");
   const [isValid, setIsValid] = useState(true);
-  const { getZoneClass, loading } = useChicagoCity();
-  const { sendPrompt } = useOpenAI();
 
   const validateChicagoAddress = (addr: string): boolean => {
     // Basic validation - ensure it's not empty and contains some street info
@@ -31,15 +27,6 @@ const AddressInput = ({ onSubmit }: AddressInputProps) => {
     setIsValid(true);
 
     try {
-
-      const { addressMatched, zoneClass} = await getZoneClass(address);
-      if (!zoneClass) throw new Error("No zoning label found for location");
-      console.log(`Zoning for ${addressMatched}:`, zoneClass);
-
-      const response = await sendPrompt(addressMatched, zoneClass);
-      if (!response) throw new Error("No response from LLM");
-      console.log("LLM Response:", response);
-
       // This isn't used currently
       if (onSubmit) onSubmit(address);
     } catch (err) {
@@ -94,9 +81,9 @@ const AddressInput = ({ onSubmit }: AddressInputProps) => {
           <Button
             type="submit"
             className="btn-primary w-full h-14 text-lg"
-            disabled={!address.trim() || loading}
+            disabled={!address.trim()}
           >
-            {loading ? 'Searching…' : 'Get Property Information'}
+            {'Get Property Information'}
           </Button>
         </form>
 
@@ -122,7 +109,7 @@ const AddressInput = ({ onSubmit }: AddressInputProps) => {
               Comprehensive Reports
             </h3>
             <p className="text-muted-foreground text-sm">
-              Zoning codes, ownership, tax info, permits, and violation history.
+              Zoning codes.
             </p>
           </div>
           
