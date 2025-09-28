@@ -37,65 +37,69 @@ interface GoogleMapsWindow extends Window {
   };
 }
 
-// Function to create and download an empty PDF
-const createEmptyPDF = (filename: string) => {
-  // Simple PDF content structure (minimal PDF)
-  const pdfContent = `%PDF-1.4
-1 0 obj
-<<
-/Type /Catalog
-/Pages 2 0 R
->>
-endobj
+// Function to fetch and download PDF from public folder
+const fetchAndDownloadPDF = async (filename: string) => {
+  try {
+    // Fetch the list of files in the public directory
+    const response = await fetch('/');
+    const html = await response.text();
+    
+    // Parse HTML to find PDF files (this is a simple approach)
+    // In a real scenario, you might need a proper file listing API
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const links = Array.from(doc.querySelectorAll('a[href]'));
+    
+    // Look for PDF files
+    const pdfFiles = links
+      .map(link => link.getAttribute('href'))
+      .filter(href => href && href.endsWith('.pdf'))
+      .filter(href => !href.startsWith('http')); // Only local files
+    
+    if (pdfFiles.length === 0) {
+      // Fallback: try common PDF names or use a default approach
+      const commonPdfPaths = [
+        '/sample.pdf',
+        '/report.pdf',
+        '/template.pdf',
+        '/property-report.pdf'
+      ];
+      
+      // Try each common path
+      for (const path of commonPdfPaths) {
+        try {
+          const testResponse = await fetch(path, { method: 'HEAD' });
+          if (testResponse.ok) {
+            await downloadPDF(path, filename);
+            return;
+          }
+        } catch (error) {
+          continue;
+        }
+      }
+      
+      throw new Error('No PDF files found in public folder');
+    }
+    
+    // Use the first PDF found
+    const firstPdf = pdfFiles[0];
+    await downloadPDF(firstPdf, filename);
+    
+  } catch (error) {
+    console.error('Error fetching PDF from public folder:', error);
+    throw error;
+  }
+};
 
-2 0 obj
-<<
-/Type /Pages
-/Kids [3 0 R]
-/Count 1
->>
-endobj
-
-3 0 obj
-<<
-/Type /Page
-/Parent 2 0 R
-/MediaBox [0 0 612 792]
-/Contents 4 0 R
->>
-endobj
-
-4 0 obj
-<<
-/Length 44
->>
-stream
-BT
-/F1 12 Tf
-100 700 Td
-(Property Report) Tj
-ET
-endstream
-endobj
-
-xref
-0 5
-0000000000 65535 f 
-0000000009 00000 n 
-0000000058 00000 n 
-0000000115 00000 n 
-0000000217 00000 n 
-trailer
-<<
-/Size 5
-/Root 1 0 R
->>
-startxref
-313
-%%EOF`;
-
-  // Create blob and download
-  const blob = new Blob([pdfContent], { type: 'application/pdf' });
+// Function to download PDF file
+const downloadPDF = async (pdfPath: string, filename: string) => {
+  const response = await fetch(pdfPath);
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch PDF: ${response.statusText}`);
+  }
+  
+  const blob = await response.blob();
   const url = URL.createObjectURL(blob);
   
   const link = document.createElement('a');
@@ -132,7 +136,7 @@ const ResultsSection = ({ propertyData, onStartOver }: ResultsSectionProps) => {
       const filename = `property_report_${sanitizedAddress}.pdf`;
       
       // Create and download the empty PDF
-      createEmptyPDF(filename);
+      fetchAndDownloadPDF(filename);
       
       toast({
         title: "Success",
