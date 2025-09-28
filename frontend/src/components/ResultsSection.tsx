@@ -37,6 +37,88 @@ interface GoogleMapsWindow extends Window {
   };
 }
 
+// Function to create and download an empty PDF
+const createEmptyPDF = (filename: string) => {
+  // Simple PDF content structure (minimal PDF)
+  const pdfContent = `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+
+4 0 obj
+<<
+/Length 44
+>>
+stream
+BT
+/F1 12 Tf
+100 700 Td
+(Property Report) Tj
+ET
+endstream
+endobj
+
+xref
+0 5
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000217 00000 n 
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+313
+%%EOF`;
+
+  // Create blob and download
+  const blob = new Blob([pdfContent], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  // Clean up the URL
+  URL.revokeObjectURL(url);
+};
+
+// Function to sanitize filename
+const sanitizeFilename = (address: string): string => {
+  return address
+    .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .trim()
+    .toLowerCase();
+};
+
 const ResultsSection = ({ propertyData, onStartOver }: ResultsSectionProps) => {
   const { toast } = useToast();
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -45,9 +127,16 @@ const ResultsSection = ({ propertyData, onStartOver }: ResultsSectionProps) => {
 
   const handleDownloadPDF = async () => {
     try {
+      // Sanitize the address for use as filename
+      const sanitizedAddress = sanitizeFilename(propertyData.address);
+      const filename = `property_report_${sanitizedAddress}.pdf`;
+      
+      // Create and download the empty PDF
+      createEmptyPDF(filename);
+      
       toast({
         title: "Success",
-        description: "Property report downloaded successfully!",
+        description: `Property report downloaded successfully as ${filename}!`,
       });
     } catch (error) {
       toast({
