@@ -1,5 +1,7 @@
 import { useState } from "react";
 import AddressInput from "../components/AddressInput";
+import { ChicagoProvider } from "../../../app/providers/CoordinatesProvider";
+import { ChicagoCityProvider } from "../../../app/providers/ChicagoCityProvider";
 import LoadingSection from "../components/LoadingSection";
 import ResultsSection from "../components/ResultsSection";
 import { useToast } from "../hooks/use-toast";
@@ -64,7 +66,11 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8">
         {currentState === "input" && (
           <div className="section-enter">
-            <AddressInput onSubmit={handleAddressSubmit} />
+            <ChicagoProvider>
+              <ChicagoCityProvider>
+                <AddressInput onSubmit={handleAddressSubmit} />
+              </ChicagoCityProvider>
+            </ChicagoProvider>
           </div>
         )}
         

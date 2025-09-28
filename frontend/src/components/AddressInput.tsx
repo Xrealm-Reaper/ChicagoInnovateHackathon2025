@@ -2,30 +2,48 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapPin, Search } from "lucide-react";
+import { useChicago } from "../../../app/providers/CoordinatesProvider";
+import { useChicagoCity } from "../../../app/providers/ChicagoCityProvider";
 
 interface AddressInputProps {
-  onSubmit: (address: string) => void;
+  onSubmit?: (address: string) => void;
 }
 
 const AddressInput = ({ onSubmit }: AddressInputProps) => {
   const [address, setAddress] = useState("");
   const [isValid, setIsValid] = useState(true);
+  const { sendAddress, loading } = useChicago();
+  const { getZoneClass } = useChicagoCity();
 
   const validateChicagoAddress = (addr: string): boolean => {
     // Basic validation - ensure it's not empty and contains some street info
     return addr.trim().length > 5 && /\d/.test(addr);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateChicagoAddress(address)) {
       setIsValid(false);
       return;
     }
-    
+
     setIsValid(true);
-    onSubmit(address);
+
+    try {
+
+      const coords = await sendAddress(address); 
+      if (!coords?.lat || !coords?.lng) throw new Error("No coordinates returned");
+
+      const zoneLabel = await getZoneClass({ lat: coords.lat, lng: coords.lng });
+      if (!zoneLabel) throw new Error("No zoning label found for location");
+      console.log(`Zoning for ${address} (${coords.lat}, ${coords.lng}):`, zoneLabel);
+
+      // This isn't used currently
+      if (onSubmit) onSubmit(address);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,9 +93,9 @@ const AddressInput = ({ onSubmit }: AddressInputProps) => {
           <Button
             type="submit"
             className="btn-primary w-full h-14 text-lg"
-            disabled={!address.trim()}
+            disabled={!address.trim() || loading}
           >
-            Get Property Information
+            {loading ? 'Searching…' : 'Get Property Information'}
           </Button>
         </form>
 
