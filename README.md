@@ -1,15 +1,11 @@
-# Nicolas's App Template
+# README
 
-This is a full-stack app template that I use to build my own apps.
+## Setup
 
-To learn how to use this template with the best AI tools & workflows, check out my workshops on [Takeoff](https://JoinTakeoff.com/)!
-
-## Tech Stack
-
-- Frontend: [Next.js](https://nextjs.org/docs), [Tailwind](https://tailwindcss.com/docs/guides/nextjs), [Shadcn](https://ui.shadcn.com/docs/installation), [Framer Motion](https://www.framer.com/motion/introduction/)
-- Backend: [PostgreSQL](https://www.postgresql.org/about/), [Supabase](https://supabase.com/), [Drizzle](https://orm.drizzle.team/docs/get-started-postgresql), [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations)
-- Auth: [Clerk](https://clerk.com/)
-- Payments: [Stripe](https://stripe.com/)
+1. Clone the repository
+2. Copy `.env.example` to `.env.local` and fill in the environment variables for OPENAI
+3. Run `npm install` to install dependencies
+4. Run `npm run dev` to run the app locally
 
 ## Prerequisites
 
