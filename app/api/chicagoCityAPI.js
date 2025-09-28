@@ -1,8 +1,6 @@
 import {
   geocodeAddress,
-  projectTo3435,
-  extractStreetTypeToken,
-  streetTypeMatches,
+  projectTo3435
 } from "./addressConverter.js";
 
 /** Zoning MapServer endpoint */
