@@ -60,7 +60,7 @@ const AddressInput = ({ onSubmit }: AddressInputProps) => {
           <MapPin className="w-8 h-8 text-primary" />
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-          Chicago Property Information
+          ZONE IN
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           Get comprehensive zoning codes, property details, and generate professional 
@@ -110,7 +110,7 @@ const AddressInput = ({ onSubmit }: AddressInputProps) => {
               Accurate Data
             </h3>
             <p className="text-muted-foreground text-sm">
-              Direct integration with Chicago City API for real-time property information.
+              Direct integration with Chicago's Official City APIs for real-time property information.
             </p>
           </div>
           
@@ -122,7 +122,7 @@ const AddressInput = ({ onSubmit }: AddressInputProps) => {
               Comprehensive Reports
             </h3>
             <p className="text-muted-foreground text-sm">
-              Zoning codes, ownership, tax info, permits, and violation history.
+              Turning complex zoning codes into fast, accurate, and accessible insights.
             </p>
           </div>
           
