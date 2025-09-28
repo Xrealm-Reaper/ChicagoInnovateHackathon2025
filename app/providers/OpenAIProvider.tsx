@@ -1,16 +1,19 @@
 "use client";
 import React, { createContext, useContext, useState } from 'react';
+import { DEFAULT_PROMPT } from '../prompt';
 
 type OpenAIRequest = {
   prompt?: string;
   address?: string | Record<string, any>;
+  zoning?: string;
   basePrompt?: string;
 };
 
 type OpenAIContextValue = {
   loading: boolean;
   error: string | null;
-  sendPrompt: (payload: OpenAIRequest) => Promise<any>;
+  // sendPrompt now requires address and zoning
+  sendPrompt: (address: string, zoning: string, basePrompt?: string) => Promise<any>;
 };
 
 const OpenAIContext = createContext<OpenAIContextValue | undefined>(undefined);
@@ -19,17 +22,25 @@ export const OpenAIProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function sendPrompt(payload: OpenAIRequest) {
+  async function sendPrompt(address: string, zoning: string) {
+    console.log('sendPrompt called with:', { address, zoning });
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/openai-api', {
+      if (!address || !zoning) {
+        throw new Error('sendPrompt requires address and zoning');
+      }
+
+      const payload: OpenAIRequest = { address, zoning, basePrompt: DEFAULT_PROMPT };
+
+      const res = await fetch('http://localhost:3000/api/openai-api', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       const data = await res.json();
+      console.log('OpenAI response data:', data);
       setLoading(false);
       if (!res.ok) throw new Error(data?.error || 'OpenAI API error');
       return data;

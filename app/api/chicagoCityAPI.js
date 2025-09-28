@@ -78,7 +78,7 @@ export function extractZoneClass(identifyJson) {
  */
 export async function getZoningByAddress(
   address,
-  { strict = true, layers = [15], bufferFeet = 500 } = {}
+  { strict = false, layers = [15], bufferFeet = 500 } = {}
 ) {
   // 1) Geocode (ranked)
   const geo = await geocodeAddress(address);

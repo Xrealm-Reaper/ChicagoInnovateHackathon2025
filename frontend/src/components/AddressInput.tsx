@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapPin, Search } from "lucide-react";
-import { useChicago } from "../../../app/providers/CoordinatesProvider";
 import { useChicagoCity } from "../../../app/providers/ChicagoCityProvider";
+import { useOpenAI } from "../../../app/providers/OpenAIProvider";
 
 interface AddressInputProps {
   onSubmit?: (address: string) => void;
@@ -12,8 +12,8 @@ interface AddressInputProps {
 const AddressInput = ({ onSubmit }: AddressInputProps) => {
   const [address, setAddress] = useState("");
   const [isValid, setIsValid] = useState(true);
-  const { sendAddress, loading } = useChicago();
-  const { getZoneClass } = useChicagoCity();
+  const { getZoneClass, loading } = useChicagoCity();
+  const { sendPrompt } = useOpenAI();
 
   const validateChicagoAddress = (addr: string): boolean => {
     // Basic validation - ensure it's not empty and contains some street info
@@ -32,12 +32,13 @@ const AddressInput = ({ onSubmit }: AddressInputProps) => {
 
     try {
 
-      const coords = await sendAddress(address); 
-      if (!coords?.lat || !coords?.lng) throw new Error("No coordinates returned");
-
-      const zoneLabel = await getZoneClass({ lat: coords.lat, lng: coords.lng });
+      const zoneLabel = await getZoneClass(address);
       if (!zoneLabel) throw new Error("No zoning label found for location");
-      console.log(`Zoning for ${address} (${coords.lat}, ${coords.lng}):`, zoneLabel);
+      console.log(`Zoning for ${address}:`, zoneLabel);
+
+      const response = await sendPrompt(address, zoneLabel);
+      if (!response) throw new Error("No response from LLM");
+      console.log("LLM Response:", response);
 
       // This isn't used currently
       if (onSubmit) onSubmit(address);
