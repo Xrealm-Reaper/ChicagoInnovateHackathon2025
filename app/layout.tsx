@@ -2,6 +2,7 @@ import { CheckoutRedirect } from "@/components/payments/checkout-redirect"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { TailwindIndicator } from "@/components/utility/tailwind-indicator"
 import { ClerkProvider } from "@clerk/nextjs"
+import { OpenAIProvider } from "./providers/OpenAIProvider";
 import type { Metadata } from "next"
 import { ThemeProvider } from "next-themes"
 import { Geist, Geist_Mono } from "next/font/google"
@@ -36,11 +37,13 @@ export default function RootLayout({
         >
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
             <TooltipProvider>
-              {children}
-              <CheckoutRedirect />
+              <OpenAIProvider>
+                {children}
+                <CheckoutRedirect />
 
-              <TailwindIndicator />
-              <Toaster />
+                <TailwindIndicator />
+                <Toaster />
+              </OpenAIProvider>
             </TooltipProvider>
           </ThemeProvider>
         </body>

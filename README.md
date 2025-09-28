@@ -2,8 +2,6 @@
 
 This is a full-stack app template that I use to build my own apps.
 
-To learn how to use this template with the best AI tools & workflows, check out my workshops on [Takeoff](https://JoinTakeoff.com/)!
-
 ## Tech Stack
 
 - Frontend: [Next.js](https://nextjs.org/docs), [Tailwind](https://tailwindcss.com/docs/guides/nextjs), [Shadcn](https://ui.shadcn.com/docs/installation), [Framer Motion](https://www.framer.com/motion/introduction/)
