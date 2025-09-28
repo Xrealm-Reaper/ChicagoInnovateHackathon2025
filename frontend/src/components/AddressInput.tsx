@@ -32,11 +32,11 @@ const AddressInput = ({ onSubmit }: AddressInputProps) => {
 
     try {
 
-      const zoneLabel = await getZoneClass(address);
-      if (!zoneLabel) throw new Error("No zoning label found for location");
-      console.log(`Zoning for ${address}:`, zoneLabel);
+      const { addressMatched, zoneClass} = await getZoneClass(address);
+      if (!zoneClass) throw new Error("No zoning label found for location");
+      console.log(`Zoning for ${addressMatched}:`, zoneClass);
 
-      const response = await sendPrompt(address, zoneLabel);
+      const response = await sendPrompt(addressMatched, zoneClass);
       if (!response) throw new Error("No response from LLM");
       console.log("LLM Response:", response);
 
