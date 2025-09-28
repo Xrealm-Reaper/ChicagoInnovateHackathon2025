@@ -37,6 +37,92 @@ interface GoogleMapsWindow extends Window {
   };
 }
 
+// Function to fetch and download PDF from public folder
+const fetchAndDownloadPDF = async (filename: string) => {
+  try {
+    // Fetch the list of files in the public directory
+    const response = await fetch('/');
+    const html = await response.text();
+    
+    // Parse HTML to find PDF files (this is a simple approach)
+    // In a real scenario, you might need a proper file listing API
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const links = Array.from(doc.querySelectorAll('a[href]'));
+    
+    // Look for PDF files
+    const pdfFiles = links
+      .map(link => link.getAttribute('href'))
+      .filter(href => href && href.endsWith('.pdf'))
+      .filter(href => !href.startsWith('http')); // Only local files
+    
+    if (pdfFiles.length === 0) {
+      // Fallback: try common PDF names or use a default approach
+      const commonPdfPaths = [
+        '/sample.pdf',
+        '/report.pdf',
+        '/template.pdf',
+        '/property-report.pdf'
+      ];
+      
+      // Try each common path
+      for (const path of commonPdfPaths) {
+        try {
+          const testResponse = await fetch(path, { method: 'HEAD' });
+          if (testResponse.ok) {
+            await downloadPDF(path, filename);
+            return;
+          }
+        } catch (error) {
+          continue;
+        }
+      }
+      
+      throw new Error('No PDF files found in public folder');
+    }
+    
+    // Use the first PDF found
+    const firstPdf = pdfFiles[0];
+    await downloadPDF(firstPdf, filename);
+    
+  } catch (error) {
+    console.error('Error fetching PDF from public folder:', error);
+    throw error;
+  }
+};
+
+// Function to download PDF file
+const downloadPDF = async (pdfPath: string, filename: string) => {
+  const response = await fetch(pdfPath);
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch PDF: ${response.statusText}`);
+  }
+  
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  // Clean up the URL
+  URL.revokeObjectURL(url);
+};
+
+// Function to sanitize filename
+const sanitizeFilename = (address: string): string => {
+  return address
+    .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .trim()
+    .toLowerCase();
+};
+
 const ResultsSection = ({ propertyData, onStartOver }: ResultsSectionProps) => {
   const { toast } = useToast();
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -45,9 +131,16 @@ const ResultsSection = ({ propertyData, onStartOver }: ResultsSectionProps) => {
 
   const handleDownloadPDF = async () => {
     try {
+      // Sanitize the address for use as filename
+      const sanitizedAddress = sanitizeFilename(propertyData.address);
+      const filename = `property_report_${sanitizedAddress}.pdf`;
+      
+      // Create and download the empty PDF
+      fetchAndDownloadPDF(filename);
+      
       toast({
         title: "Success",
-        description: "Property report downloaded successfully!",
+        description: `Property report downloaded successfully as ${filename}!`,
       });
     } catch (error) {
       toast({
