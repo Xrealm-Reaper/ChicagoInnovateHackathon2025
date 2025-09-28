@@ -20,6 +20,7 @@
     "db:seed": "npx bun db/seed",
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "test:zoning": "node app/scripts/test-zoning.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {
